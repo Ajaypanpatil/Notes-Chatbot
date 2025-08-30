@@ -7,7 +7,7 @@ const app = express();
 
 // middlewares
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "*",  // during dev: "*", prod: your frontend domain
+  origin: "https://noteschatbot.vercel.app",
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type"],
 };
