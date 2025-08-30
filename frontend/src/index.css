@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom global overrides */
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Optional: Smooth font rendering */
+body {
+  @apply bg-gray-100 text-gray-900 antialiased;
+}
