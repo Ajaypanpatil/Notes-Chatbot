@@ -96,13 +96,10 @@ npm run dev
 <video controls src="Notes Chatbot Demo.mp4" title="Note ChatBot Demo"></video>
 
 
+---
 
+## 👤 Author
+**Ajay Santosh Panpatil**
 
-👤 Author
-
-Ajay Santosh Panpatil
-
-GitHub: Ajaypanpatil
-
-LinkedIn: Ajay Panpatil
-
+- GitHub: [Ajaypanpatil](https://github.com/Ajaypanpatil)  
+- LinkedIn: [Ajay Panpatil](https://www.linkedin.com/in/ajay-panpatil-9413572a1/)  
