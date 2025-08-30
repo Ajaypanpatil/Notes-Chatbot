@@ -55,33 +55,38 @@ This ensures **contextual, accurate, and memory-efficient answers**.
 git clone https://github.com/Ajaypanpatil/Notes-Chatbot.git
 cd Notes-Chatbot
 
+```
 2️⃣ Backend Setup
+```bash
 cd backend
 npm install
-
+```
 
 Create a .env file in /backend:
 
+```bash
 PORT=5000
 GEMINI_API_KEY=your_api_key_here
-
+```
 
 Start backend:
-
+```bash
 npm run dev
+```
 
 3️⃣ Frontend Setup
+```bash
 cd frontend
 npm install
-
+```
 
 Create a .env file in /frontend:
-
+```bash
 VITE_API_URL=http://localhost:5000
-
+```
 
 Start frontend:
-
+```bash
 npm run dev
 ```
 ---
