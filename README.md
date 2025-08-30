@@ -7,6 +7,9 @@
 [![Express](https://img.shields.io/badge/Framework-Express-black?logo=express&logoColor=white)](https://expressjs.com/)
 [![LangChain](https://img.shields.io/badge/AI-LangChain-orange)](https://www.langchain.com/)
 [![HuggingFace](https://img.shields.io/badge/Embeddings-HuggingFace-yellow?logo=huggingface&logoColor=white)](https://huggingface.co/)
+[![Google Gemini](https://img.shields.io/badge/LLM-Google%20Gemini-4285F4?logo=google&logoColor=white)](https://ai.google.dev/gemini-api)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel&logoColor=white)](https://vercel.com/)
+[![Render](https://img.shields.io/badge/Deploy-Render-46E3B7?logo=render&logoColor=white)](https://render.com/)
 
 An **AI-powered study assistant chatbot** that helps students and professionals work with **long PDFs (300+ pages)** such as notes, books, or research papers.  
 
