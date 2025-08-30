@@ -56,7 +56,7 @@ git clone https://github.com/Ajaypanpatil/Notes-Chatbot.git
 cd Notes-Chatbot
 
 ```
-2️⃣ Backend Setup
+### 2️⃣ Backend Setup
 ```bash
 cd backend
 npm install
@@ -74,7 +74,7 @@ Start backend:
 npm run dev
 ```
 
-3️⃣ Frontend Setup
+### 3️⃣ Frontend Setup
 ```bash
 cd frontend
 npm install
