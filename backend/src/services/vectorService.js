@@ -1,5 +1,5 @@
 import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
-import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/huggingface_transformers"; // ✅ new import
+import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/huggingface_transformers";
 import fs from "fs";
 import path from "path";
 
@@ -8,12 +8,21 @@ let loadedStores = {};
 
 const getIndexPath = (subject) => path.join(indicesPath, `${subject}_index`);
 
-export const storeEmbeddings = async (chunks, subject) => {
+export const storeEmbeddings = async (chunks, subject, append = false) => {
   const embeddings = new HuggingFaceTransformersEmbeddings({
-    model: "Xenova/all-MiniLM-L6-v2", 
+    model: "Xenova/all-MiniLM-L6-v2",
   });
 
-  const vectorStore = await HNSWLib.fromTexts(chunks, {}, embeddings);
+  let vectorStore;
+
+  if (append && fs.existsSync(getIndexPath(subject))) {
+    // Load existing index and add new chunks
+    vectorStore = await HNSWLib.load(getIndexPath(subject), embeddings);
+    await vectorStore.addDocuments(chunks.map((t) => ({ pageContent: t })));
+  } else {
+    // Create new store for first batch
+    vectorStore = await HNSWLib.fromTexts(chunks, {}, embeddings);
+  }
 
   fs.mkdirSync(indicesPath, { recursive: true });
   await vectorStore.save(getIndexPath(subject));
@@ -28,7 +37,7 @@ export const loadVectorStore = async (subject) => {
   const indexPath = getIndexPath(subject);
   if (fs.existsSync(indexPath)) {
     const embeddings = new HuggingFaceTransformersEmbeddings({
-      model: "Xenova/all-MiniLM-L6-v2", // ✅ updated
+      model: "Xenova/all-MiniLM-L6-v2",
     });
     const vectorStore = await HNSWLib.load(indexPath, embeddings);
     loadedStores[subject] = vectorStore;
@@ -38,8 +47,7 @@ export const loadVectorStore = async (subject) => {
   }
 };
 
-
 export const getRetriever = async (subject, k = 8) => {
   const store = await loadVectorStore(subject);
-  return store.asRetriever(k); // ✅ fetches more context
+  return store.asRetriever(k); // fetch more context
 };

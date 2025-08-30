@@ -7,22 +7,34 @@ import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { storeEmbeddings } from "./vectorService.js";
 
 export const processPDF = async (filePath, subject) => {
-  // read PDF
-  const dataBuffer = fs.readFileSync(filePath);
-  const data = await pdf(dataBuffer);
+  try {
+    // read PDF
+    const dataBuffer = fs.readFileSync(filePath);
+    const data = await pdf(dataBuffer);
 
-  // split into chunks
-  const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 1000,  // ~1-2 pages
-    chunkOverlap: 200
-  });
+    // split into chunks (~1–2 pages each)
+    const splitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 1000,
+      chunkOverlap: 200,
+    });
 
-  const chunks = await splitter.splitText(data.text);
-  console.log(`📄 PDF split into ${chunks.length} chunks for ${subject}`);
+    const chunks = await splitter.splitText(data.text);
+    console.log(`PDF split into ${chunks.length} chunks for ${subject}`);
 
-  // save embeddings into FAISS
-  await storeEmbeddings(chunks, subject);
+    // process in batches (to avoid OOM)
+    const batchSize = 5;
+    for (let i = 0; i < chunks.length; i += batchSize) {
+      const batch = chunks.slice(i, i + batchSize);
+      await storeEmbeddings(batch, subject, i > 0); // append after first batch
+      console.log(`Processed batch ${i / batchSize + 1}`);
+    }
 
-  // delete uploaded file after processing
-  fs.unlinkSync(filePath);
+    // delete uploaded file after processing
+    fs.unlinkSync(filePath);
+
+    return { success: true, message: `PDF processed for ${subject}` };
+  } catch (err) {
+    console.error("PDF processing error:", err);
+    return { error: "Failed to process PDF" };
+  }
 };
