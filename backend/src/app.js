@@ -5,15 +5,14 @@ import askRoutes from "./routes/askRoutes.js";
 
 const app = express();
 
-// ✅ Allow both local dev and deployed frontend
+// ✅ Allow both localhost (dev) and Vercel (prod)
 const allowedOrigins = [
-  "http://localhost:5173", // for local frontend dev
-  "https://noteschatbot.vercel.app", // deployed frontend
+  "http://localhost:5173",
+  "https://noteschatbot.vercel.app",
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // allow requests with no origin (like curl, Postman)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -27,13 +26,13 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// ✅ health check route (helps Render keep it alive)
-app.get("/healthz", (req, res) => {
-  res.json({ status: "ok" });
-});
-
 // routes
 app.use("/upload", uploadRoutes);
 app.use("/ask", askRoutes);
+
+// ✅ health check
+app.get("/healthz", (req, res) => {
+  res.json({ status: "ok" });
+});
 
 export default app;
