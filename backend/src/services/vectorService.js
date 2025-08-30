@@ -1,5 +1,5 @@
 import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
-import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/huggingface_transformers";
+import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/huggingface_transformers"; // ✅ new import
 import fs from "fs";
 import path from "path";
 
@@ -8,21 +8,12 @@ let loadedStores = {};
 
 const getIndexPath = (subject) => path.join(indicesPath, `${subject}_index`);
 
-export const storeEmbeddings = async (chunks, subject, append = false) => {
+export const storeEmbeddings = async (chunks, subject) => {
   const embeddings = new HuggingFaceTransformersEmbeddings({
-    model: "Xenova/all-MiniLM-L6-v2",
+    model: "Xenova/all-MiniLM-L6-v2", 
   });
 
-  let vectorStore;
-
-  if (append && fs.existsSync(getIndexPath(subject))) {
-    // Load existing index and add new chunks
-    vectorStore = await HNSWLib.load(getIndexPath(subject), embeddings);
-    await vectorStore.addDocuments(chunks.map((t) => ({ pageContent: t })));
-  } else {
-    // Create new store for first batch
-    vectorStore = await HNSWLib.fromTexts(chunks, {}, embeddings);
-  }
+  const vectorStore = await HNSWLib.fromTexts(chunks, {}, embeddings);
 
   fs.mkdirSync(indicesPath, { recursive: true });
   await vectorStore.save(getIndexPath(subject));
@@ -47,7 +38,8 @@ export const loadVectorStore = async (subject) => {
   }
 };
 
+
 export const getRetriever = async (subject, k = 8) => {
   const store = await loadVectorStore(subject);
-  return store.asRetriever(k); // fetch more context
+  return store.asRetriever(k); 
 };
