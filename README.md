@@ -81,6 +81,8 @@ Start frontend:
 
 npm run dev
 
+---
+
 📸 Screenshots
 
 ![Landing Page](<Notes Chatbot Demo 1.png>) 
