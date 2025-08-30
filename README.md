@@ -93,7 +93,7 @@ npm run dev
 
 ![alt text](<Notes Chatbot Demo 4.png>)
 
-<video controls src="Notes Chatbot Demo.mp4" title="Title"></video>
+<video controls src="Notes Chatbot Demo.mp4" title="Note ChatBot Demo"></video>
 
 
 
