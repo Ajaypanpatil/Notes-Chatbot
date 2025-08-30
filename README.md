@@ -101,5 +101,5 @@ npm run dev
 ## 👤 Author
 **Ajay Santosh Panpatil**
 
-- GitHub: [Ajaypanpatil](https://github.com/Ajaypanpatil)  
-- LinkedIn: [Ajay Panpatil](https://www.linkedin.com/in/ajay-panpatil-9413572a1/)  
+[![GitHub](https://img.shields.io/badge/GitHub-Ajaypanpatil-181717?logo=github)](https://github.com/Ajaypanpatil)  
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Ajay%20Panpatil-0A66C2?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ajay-panpatil-9413572a1/)  
