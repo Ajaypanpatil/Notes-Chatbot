@@ -1,45 +1,52 @@
-import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
-import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/huggingface_transformers"; // ✅ new import
-import fs from "fs";
-import path from "path";
+// src/services/vectorService.js
+import { HNSWLib } from '@langchain/community/vectorstores/hnswlib'
+import { HuggingFaceTransformersEmbeddings } from '@langchain/community/embeddings/huggingface_transformers'
+import fs from 'fs'
+import path from 'path'
 
-const indicesPath = path.join(process.cwd(), "data");
-let loadedStores = {};
+const indicesPath = path.join(process.cwd(), 'data')
+const getIndexPath = (chatId) => path.join(indicesPath, `chat_${chatId}_index`)
 
-const getIndexPath = (subject) => path.join(indicesPath, `${subject}_index`);
+let loadedStores = {}
 
-export const storeEmbeddings = async (chunks, subject) => {
-  const embeddings = new HuggingFaceTransformersEmbeddings({
-    model: "Xenova/all-MiniLM-L6-v2", 
-  });
+async function getEmbeddings() {
+  return new HuggingFaceTransformersEmbeddings({
+    model: 'Xenova/all-MiniLM-L6-v2',
+  })
+}
 
-  const vectorStore = await HNSWLib.fromTexts(chunks, {}, embeddings);
+export async function createOrLoadStore(chatId) {
+  const indexPath = getIndexPath(chatId)
+  const embeddings = await getEmbeddings()
 
-  fs.mkdirSync(indicesPath, { recursive: true });
-  await vectorStore.save(getIndexPath(subject));
-  loadedStores[subject] = vectorStore;
+  if (loadedStores[chatId]) return loadedStores[chatId]
 
-  console.log(`Saved HNSWLib index for ${subject}`);
-};
-
-export const loadVectorStore = async (subject) => {
-  if (loadedStores[subject]) return loadedStores[subject];
-
-  const indexPath = getIndexPath(subject);
   if (fs.existsSync(indexPath)) {
-    const embeddings = new HuggingFaceTransformersEmbeddings({
-      model: "Xenova/all-MiniLM-L6-v2",
-    });
-    const vectorStore = await HNSWLib.load(indexPath, embeddings);
-    loadedStores[subject] = vectorStore;
-    return vectorStore;
+    const store = await HNSWLib.load(indexPath, embeddings)
+    loadedStores[chatId] = store
+    return store
   } else {
-    throw new Error(`No index found for ${subject}. Upload a PDF first.`);
+    // create empty store (we'll add docs later)
+    const store = await HNSWLib.fromTexts(['__init__'], {}, embeddings)
+    fs.mkdirSync(indicesPath, { recursive: true })
+    await store.save(indexPath)
+    loadedStores[chatId] = store
+    return store
   }
-};
+}
 
+export async function addChunksToStore(chatId, chunks) {
+  const store = await createOrLoadStore(chatId)
+  const embeddings = store.embeddings   // reuse
+  await store.addDocuments(
+    chunks.map(t => ({ pageContent: t, metadata: {} })),
+    embeddings
+  )
+  await store.save(getIndexPath(chatId))
+  return store
+}
 
-export const getRetriever = async (subject, k = 8) => {
-  const store = await loadVectorStore(subject);
-  return store.asRetriever(k); 
-};
+export async function getRetriever(chatId, k = 8) {
+  const store = await createOrLoadStore(chatId)
+  return store.asRetriever({ k })
+}

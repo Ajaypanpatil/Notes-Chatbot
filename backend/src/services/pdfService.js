@@ -1,28 +1,35 @@
-import fs from "fs";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const pdf = require("pdf-parse");
+// src/services/pdfService.js
+import fs from 'fs'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+const pdf = require('pdf-parse')
 
-import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { storeEmbeddings } from "./vectorService.js";
+import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
+import { addChunksToStore } from './vectorService.js'
+import db from '../db.js'
 
-export const processPDF = async (filePath, subject) => {
-  // read PDF
-  const dataBuffer = fs.readFileSync(filePath);
-  const data = await pdf(dataBuffer);
+export const processPDFForChat = async (filePath, chatId, originalName) => {
+  const dataBuffer = fs.readFileSync(filePath)
+  const data = await pdf(dataBuffer)
 
-  // split into chunks
   const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 1000,  // ~1-2 pages
-    chunkOverlap: 200
-  });
+    chunkSize: 1000,
+    chunkOverlap: 200,
+  })
+  const chunks = await splitter.splitText(data.text || '')
 
-  const chunks = await splitter.splitText(data.text);
-  console.log(`PDF split into ${chunks.length} chunks for ${subject}`);
+  await addChunksToStore(chatId, chunks)
 
-  // save embeddings into FAISS
-  await storeEmbeddings(chunks, subject);
+  // record doc in db
+  db.data.docs.push({
+    id: crypto.randomUUID(),
+    chatId,
+    filename: originalName,
+    pages: data.numpages || null,
+    chunks: chunks.length,
+    createdAt: new Date().toISOString(),
+  })
+  await db.write()
 
-  // delete uploaded file after processing
-  fs.unlinkSync(filePath);
-};
+  fs.unlinkSync(filePath) // clean temp upload
+}

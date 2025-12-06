@@ -1,18 +1,20 @@
-import express from "express";
-import { askQuestion } from "../services/geminiService.js";
+import express from 'express'
+import { askInChat } from '../services/llmService.js'
 
-const router = express.Router();
+const router = express.Router()
 
-// POST /ask
-router.post("/", async (req, res) => {
+// POST /ask/:chatId   { question }
+router.post('/:chatId', async (req, res) => {
   try {
-    const { subject, question } = req.body;
-    const answer = await askQuestion(subject, question);
-    res.json({ answer });
+    const { chatId } = req.params
+    const { question } = req.body
+    if (!question) return res.status(400).json({ error: 'question is required' })
+    const answer = await askInChat(chatId, question)
+    res.json({ answer })
   } catch (err) {
-    console.error("Ask error:", err);
-    res.status(500).json({ error: "Failed to answer question" });
+    console.error('Ask error:', err)
+    res.status(500).json({ error: 'Failed to answer question' })
   }
-});
+})
 
-export default router;
+export default router
